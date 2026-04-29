@@ -1,0 +1,69 @@
+---
+title: "Interaktivt kort"
+format: html
+editor: visual
+---
+
+```{r warning = FALSE, message = FALSE}
+library(tidygraph)
+library(ggraph)
+library(widyr)
+library(tidytext)
+library(tidyverse)
+library(readxl)
+library(quanteda)
+library(wordcloud)
+library(dplyr)
+library(ggplot2)
+library(leaflet)
+library(quanteda.textplots)
+```
+
+Definerer mit excel-ark som en dataframe:
+
+```{r}
+df_kort <- read_excel("C:\\Users\\julie\\OneDrive\\Dokumenter\\speciale R studio\\koordinater.xlsx")
+```
+
+Giver kortet en titel:
+
+```{r}
+Kort_titel <- "Afsenderes geografiske placering"
+```
+
+For at kunne se forskel på afsenderne, tildeles disse forskellige farver:
+
+```{r}
+farver <- colorFactor(
+  palette = "Paired", 
+  domain = df_kort$afsender)
+```
+
+Dernæst plottes kortet ind:
+
+```{r}
+leaflet() %>%
+  addTiles() %>%
+  addProviderTiles("Esri.WorldGrayCanvas") %>%
+  addCircleMarkers(
+    lng = df_kort$længdegrad,
+    lat = df_kort$breddegrad,
+    popup = df_kort$tekst,
+    label = paste0(df_kort$afsender, ", ", df_kort$år, " (", df_kort$afsender_by, ")"),
+    radius = 0.5,
+    opacity = 1,
+    color = farver(df_kort$afsender),
+    fill = TRUE,
+    fillOpacity = 1,
+    popupOptions = popupOptions(maxWidth = 200)) %>%
+  setView(lng = -2, lat = 20, zoom = 2) %>%
+  addControl(Kort_titel, position = "bottomleft") %>%
+  addLegend("bottomright",
+            pal = farver,
+            values = df_kort$afsender,
+            title = "Afsender")
+```
+
+Punkterne på kortet repræsenterer ikke den nøjagtige lokation, da det meget sjældent er den fulde adresse, der oplyses i brevene. Lokationerne er derfor i stedet plottet tilfældigt ind, da flere værdier med nøjagtigt samme koordinater ikke kan ses på kortet. Placeringen af punkterne bør derfor ses som et estimat, fremfor den konkrete placering af afsenderens adresse.
+
+Det er vigtigt at påpege at breve hvor afsenders lokation er ukendt naturligvis ikke er repræsenteret på kortet. Derudover er Henry Madsens brev fra 'Olympen' (HAFB1944) ikke inkluderet, da dette antages at være en vittighed.
