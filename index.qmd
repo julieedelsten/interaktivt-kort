@@ -48,7 +48,6 @@ leaflet() %>%
   addCircleMarkers(
     lng = df_kort$længdegrad,
     lat = df_kort$breddegrad,
-    popup = df_kort$tekst,
     label = paste0(df_kort$afsender, ", ", df_kort$år, " (", df_kort$afsender_by, ")"),
     radius = 0.5,
     opacity = 1,
